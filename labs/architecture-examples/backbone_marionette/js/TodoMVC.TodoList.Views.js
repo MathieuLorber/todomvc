@@ -2,13 +2,11 @@
 'use strict';
 
 TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) {
-
 	// Todo List Item View
 	// -------------------
 	//
 	// Display an individual todo item, and respond to changes
 	// that are made to the item, including marking completed.
-
 	Views.ItemView = Marionette.ItemView.extend({
 		tagName: 'li',
 		template: '#template-todoItemView',
@@ -25,8 +23,8 @@ TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) 
 			'click .toggle': 'toggle'
 		},
 
-		initialize: function () {
-			this.listenTo(this.model, 'change', this.render, this);
+		modelEvents: {
+			'change': 'render'
 		},
 
 		onRender: function () {
@@ -72,6 +70,7 @@ TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) 
 			}
 
 			if (e.which === ESC_KEY) {
+				this.ui.edit.val(this.model.get('title'));
 				this.$el.removeClass('editing');
 			}
 		}
@@ -82,7 +81,6 @@ TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) 
 	//
 	// Controls the rendering of the list of items, including the
 	// filtering of activs vs completed items for display.
-
 	Views.ListView = Backbone.Marionette.CompositeView.extend({
 		template: '#template-todoListCompositeView',
 		itemView: Views.ItemView,
@@ -96,8 +94,8 @@ TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) 
 			'click #toggle-all': 'onToggleAllClick'
 		},
 
-		initialize: function () {
-			this.listenTo(this.collection, 'all', this.update, this);
+		collectionEvents: {
+			'all': 'update'
 		},
 
 		onRender: function () {
@@ -129,10 +127,8 @@ TodoMVC.module('TodoList.Views', function (Views, App, Backbone, Marionette, $) 
 	//
 	// Handler for filtering the list of items by showing and
 	// hiding through the use of various CSS classes
-
 	App.vent.on('todoList:filter', function (filter) {
 		filter = filter || 'all';
 		$('#todoapp').attr('class', 'filter-' + filter);
 	});
-
 });

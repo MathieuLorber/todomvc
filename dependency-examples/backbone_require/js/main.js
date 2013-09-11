@@ -22,11 +22,11 @@ require.config({
 		}
 	},
 	paths: {
-		jquery: '../../../assets/jquery.min',
-		underscore: '../../../assets/lodash.min',
-		backbone: 'lib/backbone/backbone',
-		backboneLocalstorage: 'lib/backbone/backbone.localStorage',
-		text: 'lib/require/text'
+		jquery: '../bower_components/jquery/jquery',
+		underscore: '../bower_components/underscore/underscore',
+		backbone: '../bower_components/backbone/backbone',
+		backboneLocalstorage: '../bower_components/backbone.localStorage/backbone.localStorage',
+		text: '../bower_components/requirejs-text/text'
 	}
 });
 

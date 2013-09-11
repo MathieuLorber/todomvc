@@ -1,8 +1,8 @@
-/*global Todos DS*/
+/*global Todos DS */
 'use strict';
 
 Todos.Store = DS.Store.extend({
-	revision: 11,
+	revision: 12,
 	adapter: 'Todos.LSAdapter'
 });
 

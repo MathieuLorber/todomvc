@@ -1,26 +1,20 @@
+/*global define */
 'use strict';
 
-define(
+define([
+	'flight/lib/component'
+], function (defineComponent) {
+	function mainSelector() {
+		this.toggle = function (e, data) {
+			var toggle = data.all > 0;
+			this.$node.toggle(toggle);
+		};
 
-	[
-		'flight/component'
-	],
-
-	function (defineComponent) {
-
-		return defineComponent(mainSelector);
-
-		function mainSelector() {
-
-			this.toggle = function (e, data) {
-				var toggle = data.all > 0;
-				this.$node.toggle(toggle);
-			}
-
-			this.after('initialize', function () {
-				this.$node.hide();
-				this.on(document, 'dataStatsCounted', this.toggle);
-			});
-		}
+		this.after('initialize', function () {
+			this.$node.hide();
+			this.on(document, 'dataStatsCounted', this.toggle);
+		});
 	}
-);
+
+	return defineComponent(mainSelector);
+});

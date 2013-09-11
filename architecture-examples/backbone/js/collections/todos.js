@@ -1,4 +1,4 @@
-/*global Backbone Store*/
+/*global Backbone */
 var app = app || {};
 
 (function () {
@@ -9,13 +9,12 @@ var app = app || {};
 
 	// The collection of todos is backed by *localStorage* instead of a remote
 	// server.
-	var TodoList = Backbone.Collection.extend({
-
+	var Todos = Backbone.Collection.extend({
 		// Reference to this collection's model.
 		model: app.Todo,
 
 		// Save all of the todo items under the `"todos"` namespace.
-		localStorage: new Store('todos-backbone'),
+		localStorage: new Backbone.LocalStorage('todos-backbone'),
 
 		// Filter down the list of all todo items that are finished.
 		completed: function () {
@@ -45,6 +44,5 @@ var app = app || {};
 	});
 
 	// Create our global collection of **Todos**.
-	app.Todos = new TodoList();
-
-}());
+	app.todos = new Todos();
+})();

@@ -1,4 +1,4 @@
-/*global Backbone*/
+/*global Backbone */
 var app = app || {};
 
 (function () {
@@ -6,23 +6,21 @@ var app = app || {};
 
 	// Todo Router
 	// ----------
-
-	var Workspace = Backbone.Router.extend({
+	var TodoRouter = Backbone.Router.extend({
 		routes: {
 			'*filter': 'setFilter'
 		},
 
 		setFilter: function (param) {
 			// Set the current filter to be used
-			app.TodoFilter = param.trim() || '';
+			app.TodoFilter = param || '';
 
 			// Trigger a collection filter event, causing hiding/unhiding
 			// of Todo view items
-			app.Todos.trigger('filter');
+			app.todos.trigger('filter');
 		}
 	});
 
-	app.TodoRouter = new Workspace();
+	app.TodoRouter = new TodoRouter();
 	Backbone.history.start();
-
-}());
+})();

@@ -1,107 +1,102 @@
+/*global define */
 'use strict';
 
-define(
+define([
+	'flight/lib/component',
+	'../store'
+], function (defineComponent, dataStore) {
+	function todos() {
+		var filter;
+		this.defaultAttrs({
+			dataStore: dataStore
+		});
 
-    [
-        'flight/component',
-        '../store'
-    ],
+		this.add = function (e, data) {
+			var todo = this.attr.dataStore.save({
+				title: data.title,
+				completed: false
+			});
 
-    function (defineComponent, dataStore) {
+			this.trigger('dataTodoAdded', { todo: todo, filter: filter });
+		};
 
-        return defineComponent(todos);
+		this.remove = function (e, data) {
+			var todo = this.attr.dataStore.destroy(data.id);
 
-        function todos() {
+			this.trigger('dataTodoRemoved', todo);
+		};
 
-            var filter;
+		this.load = function () {
+			var todos;
 
-            this.add = function (e, data) {
-                var todo = dataStore.save({
-                    title: data.title,
-                    completed: false
-                });
+			filter = localStorage.getItem('filter');
+			todos = this.find();
+			this.trigger('dataTodosLoaded', { todos: todos });
+		};
 
-                this.trigger('dataTodoAdded', { todo: todo, filter: filter });
-            }
+		this.update = function (e, data) {
+			this.attr.dataStore.save(data);
+		};
 
-            this.remove = function (e, data) {
-                var todo = dataStore.destroy(data.id);
+		this.toggleCompleted = function (e, data) {
+			var eventType;
+			var todo = this.attr.dataStore.get(data.id);
 
-                this.trigger('dataTodoRemoved', todo);
-            }
+			todo.completed = !todo.completed;
+			this.attr.dataStore.save(todo);
 
-            this.load = function (e, data) {
-                var todos;
+			eventType = filter ? 'dataTodoRemoved' : 'dataTodoToggled';
 
-                filter = localStorage.getItem('filter');
-                todos = this.find();
-                this.trigger('dataTodosLoaded', { todos: todos });
-            }
+			this.trigger(eventType, todo);
+		};
 
-            this.update = function (e, data) {
-                dataStore.save(data);
-            }
+		this.toggleAllCompleted = function (e, data) {
+			this.attr.dataStore.updateAll({ completed: data.completed });
+			this.trigger('dataTodoToggledAll', { todos: this.find(filter) });
+		};
 
-            this.toggleCompleted = function (e, data) {
-                var eventType;
-                var todo = dataStore.get(data.id);
+		this.filter = function (e, data) {
+			var todos;
 
-                todo.completed = !todo.completed;
-                dataStore.save(todo);
+			localStorage.setItem('filter', data.filter);
+			filter = data.filter;
+			todos = this.find();
 
-                eventType = (filter) ? 'dataTodoRemoved' : 'dataTodoToggled';
+			this.trigger('dataTodosFiltered', { todos: todos });
+		};
 
-                this.trigger(eventType, todo);
-            }
+		this.find = function () {
+			var todos;
 
-            this.toggleAllCompleted = function (e, data) {
-                dataStore.updateAll({ completed: data.completed });
-                this.trigger('dataTodoToggledAll', { todos: this.find(filter) });
-            }
+			if (filter) {
+				todos = this.attr.dataStore.find(function (each) {
+					return (typeof each[filter] !== 'undefined') ? each.completed : !each.completed;
+				});
+			} else {
+				todos = this.attr.dataStore.all();
+			}
 
-            this.filter = function (e, data) {
-                var todos;
+			return todos;
+		};
 
-                localStorage.setItem('filter', data.filter);
-                filter = data.filter;
-                todos = this.find();
+		this.clearCompleted = function () {
+			this.attr.dataStore.destroyAll({ completed: true });
 
-                this.trigger('dataTodosFiltered', { todos: todos });
-            }
+			this.trigger('uiFilterRequested', { filter: filter });
+			this.trigger('dataClearedCompleted');
+		};
 
-            this.find = function () {
-                var todos;
+		this.after('initialize', function () {
+			this.on(document, 'uiAddRequested', this.add);
+			this.on(document, 'uiUpdateRequested', this.update);
+			this.on(document, 'uiRemoveRequested', this.remove);
+			this.on(document, 'uiLoadRequested', this.load);
+			this.on(document, 'uiToggleRequested', this.toggleCompleted);
+			this.on(document, 'uiToggleAllRequested', this.toggleAllCompleted);
+			this.on(document, 'uiClearRequested', this.clearCompleted);
+			this.on(document, 'uiFilterRequested', this.filter);
+		});
+	}
 
-                if (filter) {
-                    todos = dataStore.find(function (each) {
-                        return (typeof each[filter] !== 'undefined') ? each.completed : !each.completed;
-                    });
-                }
-                else {
-                    todos = dataStore.all();
-                }
-
-                return todos;
-            }
-
-            this.clearCompleted = function () {
-                var todos;
-
-                dataStore.destroyAll({ completed: true });
-                todos = dataStore.all();
-                this.trigger('dataClearedCompleted', { todos: todos });
-            }
-
-            this.after('initialize', function () {
-                this.on(document, 'uiAddRequested', this.add);
-                this.on(document, 'uiUpdateRequested', this.update);
-                this.on(document, 'uiRemoveRequested', this.remove);
-                this.on(document, 'uiLoadRequested', this.load);
-                this.on(document, 'uiToggleRequested', this.toggleCompleted);
-                this.on(document, 'uiToggleAllRequested', this.toggleAllCompleted);
-                this.on(document, 'uiClearRequested', this.clearCompleted);
-                this.on(document, 'uiFilterRequested', this.filter);
-            });
-        }
-    }
-);
+	return defineComponent(todos);
+});
