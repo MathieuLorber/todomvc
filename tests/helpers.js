@@ -1,7 +1,11 @@
 // TODO make start here
 
 var casper = require('casper').create();
-var URL = casper.cli.get(1);
+var URL = casper.cli.get('url');
+var testName = casper.cli.get('testName');
+var fmk = casper.cli.get('fmk');
+
+var captureIndex = 0;
 
 casper.echo("Testing " + URL, 'PARAMETER');
 
@@ -69,3 +73,8 @@ casper.clean = function() {
 		document.querySelector('#clear-completed').click();
 	});
 };
+
+casper.doCapture = function() {
+	this.capture('tests/results/' + fmk + '.' + testName + '.' + captureIndex + '.png');
+	captureIndex++;
+}
