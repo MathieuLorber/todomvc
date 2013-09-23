@@ -1,7 +1,8 @@
 // De l'intérêt de faire plusieurs then ?
 // faire une table de correspondance pour les diff implem plutot (juste avoir a mettre "dart" par exemple)
 casper.start(URL, function () {
-	this.clean();
+	this.doCapture();
+	//this.cleanStorage();
 
 	this.test.assertTitleMatch(/TodoMVC$/, 'Page title contains TodoMVC');
 
@@ -108,6 +109,13 @@ casper.then(function () {
 	this.click('#toggle-all');
 
 	this.assertLeftItemsString('2 items left', 'All todos un-completed, left list cound is 2');
+});
+
+casper.then(function () {
+	// TODO essayer faire apres le renderResults
+	this.evaluate(function() {
+		window.localStorage.clear();
+	});
 });
 
 casper.run(function () {

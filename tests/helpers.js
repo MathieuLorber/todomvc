@@ -1,4 +1,5 @@
 // TODO make start here
+// TODO rename, pas juste helpers, plutot bootstrap
 
 var casper = require('casper').create();
 var URL = casper.cli.get('url');
@@ -7,7 +8,9 @@ var fmk = casper.cli.get('fmk');
 
 var captureIndex = 0;
 
-casper.echo("Testing " + URL, 'PARAMETER');
+casper.echo('Test ' + testName + ' for ' + fmk + " - " + URL, 'PARAMETER');
+// TODO param
+casper.echo('Capture');
 
 casper.addTodo = function(title) {
 	// TODO about initial focus testing
@@ -22,6 +25,7 @@ casper.addTodo = function(title) {
 
 // TODO rename "displayed" items
 casper.assertItemCount = function(itemsNumber, message) {
+	this.doCapture();
 	this.test.assertEval(function (itemsAwaitedNumber) {
 		var items = document.querySelectorAll('#todo-list li');
 		var number = 0;
@@ -62,7 +66,8 @@ casper.unselectText = function(selector) {
 
 // TODO find why most times useless
 // TODO remove localstorage instead
-casper.clean = function() {
+casper.cleanStorage = function() {
+	// make a localStorage.clear() is not enough because elements have already been created here
 	this.evaluate(function() {
 		document.querySelector('#clear-completed').click();
 	});
@@ -72,9 +77,24 @@ casper.clean = function() {
 	this.evaluate(function() {
 		document.querySelector('#clear-completed').click();
 	});
+	// ne semble meme pas marcher (ne pas oublier pb d'"affichage")
+	//this.evaluate(function() {
+	//	localStorage.clear();
+	//});
 };
 
 casper.doCapture = function() {
 	this.capture('tests/results/' + fmk + '.' + testName + '.' + captureIndex + '.png');
 	captureIndex++;
-}
+};
+
+casper.assertStorage = function(storageSize) {
+	this.test.assertEval(function (storageSize) {
+		var storage = JSON.parse(window.localStorage.getItem('todos-vanilladart'));
+		if(storageSize === 0 && storage == null) {
+			return true;
+		}
+		var size = storage.length;
+		return size === storageSize;
+	}, 'Assert storage size is ' + storageSize, storageSize);
+};

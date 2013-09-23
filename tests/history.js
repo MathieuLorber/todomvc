@@ -1,5 +1,5 @@
 casper.start(URL, function () {
-	this.clean();
+	this.cleanStorage();
 
 	this.test.assertTitleMatch(/TodoMVC$/, 'Page title contains TodoMVC');
 
