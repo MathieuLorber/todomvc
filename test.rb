@@ -72,7 +72,8 @@ def casper(fmk, test)
   # TODO option to enable casperjs output instead of table
   #print "#{$setCasper};$casperjs tests/#{test}.js #{$fmks[fmk]} > /dev/null"
   #print "\n"
-  cmd = "#{$setCasper};$casperjs --includes=tests/helpers.js test tests/#{test}.js --url=#{$fmks[fmk]} --testName=#{test} --fmk=#{fmk}"
+  cmd = "#{$setCasper};$casperjs --includes=tests/helpers.js test tests/#{test}.js --url=#{$fmks[fmk]} --testName=#{test} --fmk=#{fmk} > tests/results/#{fmk}.#{test}.log"
+  #cmd = "#{$setCasper};$casperjs --includes=tests/helpers.js test tests/#{test}.js --url=#{$fmks[fmk]} --testName=#{test} --fmk=#{fmk}"
   system(cmd) ? printok : printko
 end
 
