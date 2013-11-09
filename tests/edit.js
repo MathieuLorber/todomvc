@@ -40,7 +40,6 @@ casper.then(function() {
 	this.test.assertEquals(this.fetchText('#todo-list li:first-child label'), 'Another Task edited', 'Task title has been changed');
 });
 
-
 // edit one and onblur
 casper.then(function() {
 	this.addTodo('Conquer the world');
