@@ -1,14 +1,12 @@
-// TODO make start here
-// TODO rename, pas juste helpers, plutot bootstrap
-
 var casper = require('casper').create();
 var URL = casper.cli.get('url');
-var testName = casper.cli.get('testName');
 var fmk = casper.cli.get('fmk');
+var debug = casper.cli.get('fmk');
+var output = casper.cli.get('output');
 
 var captureIndex = 0;
 
-casper.echo('Test ' + testName + ' for ' + fmk + " - " + URL, 'PARAMETER');
+casper.echo('Test ' + fmk + " - " + URL, 'PARAMETER');
 // TODO param
 casper.echo('Capture');
 
@@ -84,7 +82,7 @@ casper.cleanStorage = function() {
 };
 
 casper.doCapture = function() {
-	this.capture('tests/results/' + fmk + '.' + testName + '.' + captureIndex + '.png');
+	this.capture('tests/results/' + fmk + '.' + captureIndex + '.png');
 	captureIndex++;
 };
 

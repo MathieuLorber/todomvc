@@ -1,25 +1,6 @@
 #!/usr/bin/env ruby
 
-# TODO check ko due to false dir is obvious
-# TODO for use './test.rb fmk scenario' (scenario optional)
-# TODO option verbose
-
-#agilityjs  angularjs-perf  canjs   dart    emberjs   jquery    knockoutjs  yui
-#angularjs  backbone  closure   dojo    gwt   knockback spine
-
-#casperjs tests/test.js vanilla-examples/vanillajs/index.html
-
-#backbone.xmpp      dijon       meteor        sammyjs
-#backbone_marionette    duel        montage       socketstream
-#batman       epitome       o_O       somajs
-#cujo       extjs       olives        stapes
-#dart       javascriptmvc     plastronjs      thorax
-#derby        knockoutjs_classBindingProvider puremvc       troopjs
-#dermis       maria       rappidjs
-
-# do not test storage for the moment
-$tests = ['count', 'edit', 'history', 'storage']
-
+# frameworks and path definitions
 $fmks = Hash.new
 $fmks['angularjs'] = 'architecture-examples/angularjs/index.html'
 $fmks['angularjs-perf'] = 'architecture-examples/angularjs-perf/index.html'
@@ -32,69 +13,77 @@ $fmks['knockoutjs'] = 'architecture-examples/knockoutjs/index.html'
 $fmks['spine'] = 'architecture-examples/spine/index.html'
 $fmks['vanillajs'] = 'vanilla-examples/vanillajs/index.html'
 
-# TODO be able to use lists of items (aka './test.rb dart jquery count edit')
+# verbose output !
+$verbose = false
 ARGV.each do |arg|
-  if $tests.include?(arg)
-    $test = arg
-  end
-  if $fmks.keys.include?(arg)
-    $fmk = arg
+  if arg == '-v'
+    $verbose = true
   end
 end
 
-def printok()
+# first line of the results table
+if !$verbose
+  printf '%-15s| ' % ' '
+  ['count', 'edit', 'history', 'storage'].each do |test|
+    printf '%-10s| ' % test
+  end
+  print "\n"
+end
+
+# def green OK
+def printOk()
   print "\033[32m"
   printf '%-10s' % 'OK'
   print "\033[0m| "
 end
 
-def printko()
+# def red KO
+def printKo()
   print "\033[31m"
   printf '%-10s' % 'KO'
   print "\033[0m| "
 end
 
-printf '%-15s| ' % ' '
-
-if $test.nil?
-  $tests.each do |test|
-    printf '%-10s| ' % test
-  end
-else
-  printf '%-10s| ' % $test
-end
-
-print "\n"
-
+# def main unit call
 $setCasper = "if [ -z ${casperjs} ]; then export casperjs=casperjs; fi"
-
-def casper(fmk, test)
+def casper(fmk)
+  # TODO check ko due to false dir is obvious
+  #File.exist?(fmkFunctions)
   # TODO option to enable casperjs output instead of table
-  #print "#{$setCasper};$casperjs tests/#{test}.js #{$fmks[fmk]} > /dev/null"
+  #print "#{$setCasper};$casperjs tests/#{test}.js #{fmks[fmk]} > /dev/null"
   #print "\n"
-  cmd = "#{$setCasper};$casperjs --includes=tests/helpers.js test tests/#{test}.js --url=#{$fmks[fmk]} --testName=#{test} --fmk=#{fmk} > tests/results/#{fmk}.#{test}.log"
-  #cmd = "#{$setCasper};$casperjs --includes=tests/helpers.js test tests/#{test}.js --url=#{$fmks[fmk]} --testName=#{test} --fmk=#{fmk}"
-  system(cmd) ? printok : printko
+  cmd = "#{$setCasper};$casperjs"
+  fmkFunctions = "tests/functions/#{fmk}.js"
+  if File.exist?(fmkFunctions)
+    cmd << " --includes=" + fmkFunctions
+  end
+  cmd << " --includes=tests/init.js "
+  cmd << " test tests/test.js "
+  cmd << " --url=#{$fmks[fmk]} --fmk=#{fmk}"
+  if $verbose
+    cmd << " --output=bash"
+    system(cmd)
+  else
+    cmd << " --output=html > tests/results/#{fmk}.html"
+    printf '%14s | ' % fmk
+    system(cmd) ? printOk : printKo
+    print "\n"
+  end 
 end
 
+# create the results dir if it doesn't exist
 system("mkdir -p tests/results")
 
-def doTests(fmk)
-  printf '%14s | ' % fmk
-  if $test.nil?
-    $tests.each do |test|
-      casper(fmk, test)
-    end
-  else
-    casper(fmk, $test)
+# launch test for each framework found in args, or for all
+testAllFmks = true
+ARGV.each do |arg|
+  if $fmks.keys.include?(arg)
+    casper(arg)
+    testAllFmks = false
   end
-  print "\n"
 end
-
-if $fmk.nil?
-  $fmks.keys.each do |fmk|
-    doTests(fmk)
+if testAllFmks
+  $fmks.each do |fmk|
+    casper(fmk)
   end
-else
-  doTests($fmk)
 end
