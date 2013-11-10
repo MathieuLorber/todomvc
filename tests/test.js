@@ -170,7 +170,7 @@ casper.then(function () {
 });
 
 casper.then(function () {
-    // TODO essayer faire apres le renderResults
+    // TODO try to do it after renderResults
     this.evaluate(function() {
         window.localStorage.clear();
     });
