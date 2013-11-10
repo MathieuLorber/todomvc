@@ -21,8 +21,7 @@ casper.enter = function() {
 if (typeof getStorageSize === "undefined") {
 	var getStorageSize = function(storageName) {
 		var storage = JSON.parse(window.localStorage.getItem(storageName));
-		// TODO == null ??
-		if (storage == null) {
+		if (!storage) {
 			return 0;
 		}
 		return storage.length;
