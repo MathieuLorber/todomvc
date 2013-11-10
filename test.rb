@@ -13,11 +13,17 @@ $fmks['knockoutjs'] = 'architecture-examples/knockoutjs/index.html'
 $fmks['spine'] = 'architecture-examples/spine/index.html'
 $fmks['vanillajs'] = 'vanilla-examples/vanillajs/index.html'
 
-# verbose output !
+# verbose and/or debug ?
 $verbose = false
+$debug = false
 ARGV.each do |arg|
-  if arg == '-v'
-    $verbose = true
+  if arg.start_with?('-')
+    if arg.include?('d')
+      $debug = true
+    end
+    if arg.include?('v')
+      $verbose = true
+    end
   end
 end
 
@@ -49,9 +55,6 @@ $setCasper = "if [ -z ${casperjs} ]; then export casperjs=casperjs; fi"
 def casper(fmk)
   # TODO check ko due to false dir is obvious
   #File.exist?(fmkFunctions)
-  # TODO option to enable casperjs output instead of table
-  #print "#{$setCasper};$casperjs tests/#{test}.js #{fmks[fmk]} > /dev/null"
-  #print "\n"
   cmd = "#{$setCasper};$casperjs"
   fmkFunctions = "tests/functions/#{fmk}.js"
   if File.exist?(fmkFunctions)
@@ -60,19 +63,21 @@ def casper(fmk)
   cmd << " --includes=tests/init.js "
   cmd << " test tests/test.js "
   cmd << " --url=#{$fmks[fmk]} --fmk=#{fmk}"
+  if $debug
+    cmd << " --debug=true"    
+  end
   if $verbose
-    cmd << " --output=bash"
     system(cmd)
   else
-    cmd << " --output=html > tests/results/#{fmk}.html"
+    cmd << " > /dev/null"
     printf '%14s | ' % fmk
     system(cmd) ? printOk : printKo
     print "\n"
   end 
 end
 
-# create the results dir if it doesn't exist
-system("mkdir -p tests/results")
+# create the results & results/imgs directories if they don't exist
+system("mkdir -p tests/results/imgs")
 
 # launch test for each framework found in args, or for all
 testAllFmks = true
@@ -83,7 +88,7 @@ ARGV.each do |arg|
   end
 end
 if testAllFmks
-  $fmks.each do |fmk|
+  $fmks.keys.each do |fmk|
     casper(fmk)
   end
 end

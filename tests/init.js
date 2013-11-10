@@ -1,28 +1,35 @@
 var casper = require('casper').create();
-var URL = casper.cli.get('url');
+var url = casper.cli.get('url');
 var fmk = casper.cli.get('fmk');
-var debug = casper.cli.get('fmk');
-var output = casper.cli.get('output');
+var debug = (casper.cli.get('debug') == true);
+
+var fs = require('fs');
 
 var captureIndex = 0;
 
-casper.echo('Test ' + fmk + " - " + URL, 'PARAMETER');
-// TODO param
-casper.echo('Capture');
+var testTitle = 'Test ' + fmk + " - " + url;
+if(debug) {
+    testTitle += ' - DEBUG';
+}
+casper.echo(testTitle, 'PARAMETER');
+
+if(typeof casper.enter !== 'function') {
+    casper.enter = function() {
+        // TODO remove one, but keep which event ? Jquery impl prefers keyup...
+        this.page.sendEvent('keydown', this.page.event.key.Enter);
+        this.page.sendEvent('keyup', this.page.event.key.Enter);
+    }
+}
 
 casper.addTodo = function(title) {
-	// TODO about initial focus testing
-	this.evaluate(function() {
-		document.querySelector('#new-todo').focus();
-	});
-	this.page.sendEvent('keydown', title);
-	// TODO remove one, but keep which event ? Jquery impl prefers keyup...
-	this.page.sendEvent('keydown', this.page.event.key.Enter);
-	this.page.sendEvent('keyup', this.page.event.key.Enter);
+    this.evaluate(function() {
+        document.querySelector('#new-todo').focus();
+    });
+    this.page.sendEvent('keydown', title);
+    this.enter();
 };
 
-// TODO rename "displayed" items
-casper.assertItemCount = function(itemsNumber, message) {
+casper.assertDisplayedItemsCount = function(itemsNumber, message) {
 	this.doCapture();
 	this.test.assertEval(function (itemsAwaitedNumber) {
 		var items = document.querySelectorAll('#todo-list li');
@@ -41,6 +48,7 @@ casper.assertItemCount = function(itemsNumber, message) {
 }
 
 casper.assertLeftItemsString = function(leftItemsString, message) {
+    this.doCapture();
 	// Backbone for example does not update string since it's not displayed. It's a valid optimization
 	if(leftItemsString == '0 items left' && !this.visible('#todo-count')) {
 		this.test.assertTrue(true, 'Left items label is not displayed - ' + message);
@@ -52,6 +60,7 @@ casper.assertLeftItemsString = function(leftItemsString, message) {
 
 // Implementations differ but text in input should not be selected when editing
 // => this function should not have to be called
+// TODO
 casper.unselectText = function(selector) {
 	var textLength = this.getElementAttribute(selector, 'value').length;
 	// without this if setSelectionRange breaks Vanilla JS & anothers test run
@@ -62,10 +71,8 @@ casper.unselectText = function(selector) {
 	}
 }
 
-// TODO find why most times useless
-// TODO remove localstorage instead
 casper.cleanStorage = function() {
-	// make a localStorage.clear() is not enough because elements have already been created here
+    // cleaning the storage with localStorage.clear() is not relevant : DOM is already built from its initial value
 	this.evaluate(function() {
 		document.querySelector('#clear-completed').click();
 	});
@@ -75,15 +82,13 @@ casper.cleanStorage = function() {
 	this.evaluate(function() {
 		document.querySelector('#clear-completed').click();
 	});
-	// ne semble meme pas marcher (ne pas oublier pb d'"affichage")
-	//this.evaluate(function() {
-	//	localStorage.clear();
-	//});
 };
 
 casper.doCapture = function() {
-	this.capture('tests/results/' + fmk + '.' + captureIndex + '.png');
-	captureIndex++;
+    if(debug) {
+        this.capture('tests/results/' + fmk + '.' + captureIndex + '.png');
+        captureIndex++;
+    }
 };
 
 casper.assertStorage = function(storageSize) {
