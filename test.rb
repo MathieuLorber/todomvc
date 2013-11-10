@@ -30,9 +30,11 @@ end
 # first line of the results table
 if !$verbose
   printf '%-15s| ' % ' '
-  ['count', 'edit', 'history', 'storage'].each do |test|
-    printf '%-10s| ' % test
-  end
+  printf '%-10s| ' % 'test'
+  # TODO come back soon !
+  #['count', 'edit', 'history', 'storage'].each do |test|
+  #  printf '%-10s| ' % test
+  #end
   print "\n"
 end
 
