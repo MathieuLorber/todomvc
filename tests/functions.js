@@ -1,10 +1,16 @@
-
-if(typeof tests === "undefined") {
+if (typeof tests === "undefined") {
     var tests = ['edit', 'count', 'history', 'storage'];
 }
 
+if (typeof storageName === "undefined") {
+    casper.echo('No storageName has been defined for sample ' + fmk, 'WARNING');
+    var storageName = function() {
+        // TODO ? will fail but not a problem ?
+        return 'todomvc';
+    };
+}
+
 // ENTER keypress
-// TODO use if(typeof casper.enter === "undefined") { for those...
 casper.enter = function() {
     // TODO remove one, but keep which event ? Jquery impl prefers keyup...
     this.page.sendEvent('keydown', this.page.event.key.Enter);
@@ -25,7 +31,7 @@ casper.addTodo = function(title) {
 casper.unselectText = function(selector) {
     var textLength = this.getElementAttribute(selector, 'value').length;
     // without this if setSelectionRange breaks Vanilla JS & anothers test run
-    if(textLength != 0) {
+    if (textLength != 0) {
         this.evaluate(function(selector, textLength) {
             document.querySelector(selector).setSelectionRange(textLength, textLength);
         }, selector, textLength);
@@ -42,7 +48,7 @@ casper.cleanStorage = function() {
 };
 
 casper.doCapture = function() {
-    if(debug) {
+    if (debug) {
         // TODO echo
         this.capture('tests/results/' + fmk + '.' + captureIndex + '.png');
         captureIndex++;
