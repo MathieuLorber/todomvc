@@ -25,12 +25,7 @@ casper.assertLeftItemsString = function(leftItemsString, message) {
 };
 
 casper.assertStorage = function(storageSize) {
-	this.test.assertEval(function(storageSize, storageName) {
-		var storage = JSON.parse(window.localStorage.getItem(storageName));
-		if (storageSize === 0 && storage == null) {
-			return true;
-		}
-		var size = storage.length;
-		return size === storageSize;
-	}, 'Assert storage size is ' + storageSize, [storageSize, storageName()]);
+	this.test.assertEval(function(getStorageSizeFunction, storageName, storageSize) {
+		return getStorageSizeFunction(storageName) === storageSize;
+	}, 'Assert storage size is ' + storageSize, [getStorageSize, storageName(), storageSize]);
 };

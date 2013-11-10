@@ -3,19 +3,31 @@ if (typeof tests === "undefined") {
 }
 
 if (typeof storageName === "undefined") {
-    casper.echo('No storageName has been defined for sample ' + fmk, 'WARNING');
-    var storageName = function() {
+	// TODO doc default name
+	var storageName = function() {
         // TODO ? will fail but not a problem ?
-        return 'todomvc';
+        return 'todos-' + fmk;
     };
 }
 
+//  TODO rename pressEnter, not in casper anymore, global fct
 // ENTER keypress
 casper.enter = function() {
     // TODO remove one, but keep which event ? Jquery impl prefers keyup...
     this.page.sendEvent('keydown', this.page.event.key.Enter);
     this.page.sendEvent('keyup', this.page.event.key.Enter);
 };
+
+if (typeof getStorageSize === "undefined") {
+	var getStorageSize = function(storageName) {
+		var storage = JSON.parse(window.localStorage.getItem(storageName));
+		// TODO == null ??
+		if (storage == null) {
+			return 0;
+		}
+		return storage.length;
+	};
+}
 
 casper.addTodo = function(title) {
     this.evaluate(function() {
