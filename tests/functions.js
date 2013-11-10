@@ -36,17 +36,14 @@ casper.cleanStorage = function() {
     // cleaning the storage with localStorage.clear() is not relevant : DOM is already built from its initial value
     this.evaluate(function() {
         document.querySelector('#clear-completed').click();
-    });
-    this.evaluate(function() {
         document.querySelector('#toggle-all').click();
-    });
-    this.evaluate(function() {
         document.querySelector('#clear-completed').click();
     });
 };
 
 casper.doCapture = function() {
     if(debug) {
+        // TODO echo
         this.capture('tests/results/' + fmk + '.' + captureIndex + '.png');
         captureIndex++;
     }
