@@ -56,12 +56,14 @@ def casper(fmk)
   # TODO check ko due to false dir is obvious
   #File.exist?(fmkFunctions)
   cmd = "#{$setCasper};$casperjs"
+  cmd << " --includes=tests/init.js"
   fmkFunctions = "tests/functions/#{fmk}.js"
   if File.exist?(fmkFunctions)
-    cmd << " --includes=" + fmkFunctions
+    cmd << "," + fmkFunctions
   end
-  cmd << " --includes=tests/init.js "
-  cmd << " test tests/test.js "
+  cmd << ",tests/functions.js"
+  cmd << ",tests/assertions.js"
+  cmd << " test tests/test.js"
   cmd << " --url=#{$fmks[fmk]} --fmk=#{fmk}"
   if $debug
     cmd << " --debug=true"    

@@ -5,16 +5,12 @@ casper.start(url, function () {
     // TODO find why most times useless
     //this.cleanStorage();
 
-    this.test.assertTitleMatch(/TodoMVC$/, 'Page title contains TodoMVC');
-
-    // TODO test auto hide string
     this.assertDisplayedItemsCount(0, 'No todo at start');
-
     this.assertLeftItemsString('0 items left', 'Left todo list count is 0');
-
     this.test.assertNotVisible('#main', '#main section is hidden');
     this.test.assertNotVisible('#toggle-all', '#toggle-all checkbox is hidden');
     this.test.assertNotVisible('#todo-count', '#todo-count span is hidden');
+    this.doCapture();
 });
 
 // Create a first todo
@@ -26,7 +22,7 @@ casper.then(function () {
     this.assertLeftItemsString('1 item left', 'Left todo list count is 1');
 
     this.test.assertEquals(this.fetchText('#todo-list li:first-child label'), 'Some Task', 'First todo is "Some Task"');
-
+    //this.test.assertFirstTask('SomeTask');
     this.test.assertVisible('#main', '#main section is displayed');
     this.test.assertVisible('#toggle-all', '#toggle-all checkbox is displayed');
     this.test.assertVisible('#todo-count', '#todo-count span is displayed');
