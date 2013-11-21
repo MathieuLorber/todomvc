@@ -71,9 +71,10 @@ def casper(fmk)
     cmd << " --debug=true"    
   end
   if $verbose
+    cmd << " | tee tests/results/" + fmk + ".log"
     system(cmd)
   else
-    cmd << " > /dev/null"
+    cmd << " > tests/results/" + fmk + ".log"
     printf '%14s | ' % fmk
     system(cmd) ? printOk : printKo
     print "\n"
