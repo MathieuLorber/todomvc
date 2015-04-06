@@ -4,7 +4,6 @@ import 'dart:html' as dom;
 import 'dart:convert' as convert;
 import 'package:angular/angular.dart';
 
-
 class StorageService {
 	final dom.Storage _storage = dom.window.localStorage;
 	static const String STORAGE_KEY = 'todos-angulardart';
@@ -51,11 +50,9 @@ class Item {
 	Map toJson() => { 'title': title, 'completed': completed };
 }
 
-
-@NgDirective(
-	selector: '[todo-controller]',
-	publishAs: 'todo'
-)
+@Component(
+    selector: '[todo-list]',
+    publishAs: 'TodoCtrl')
 class TodoController {
 	List<Item> items = [];
 	Item newItem = new Item();
@@ -71,7 +68,8 @@ class TodoController {
 		// Since there is no native support for deeply watching collections, we
 		// instead watch over the JSON-serialized string representing the items.
 		// While hugely inefficient, this is a very simple work-around.
-		scope.$watch((Scope scope) => convert.JSON.encode(items), save);
+		// TODO is broken
+		scope.watch(convert.JSON.encode(items), (value, previousValue) => save);
 	}
 
 	void save() {

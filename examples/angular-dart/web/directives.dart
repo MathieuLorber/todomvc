@@ -1,11 +1,11 @@
 import 'dart:html' as dom;
 import 'package:angular/angular.dart';
 
-@NgDirective(
+@Decorator(
 	selector: '[todo-escape]',
 	map: const {'todo-escape': '&onEscape'}
 )
-@NgDirective(
+@Decorator(
 	selector: '[todo-focus]',
 	map: const {'todo-focus': '@todoFocus'}
 )
@@ -21,7 +21,7 @@ class TodoDOMEventDirective {
 
 		if (!listeners.containsKey(key)) {
 			listeners[key] = value;
-			stream.listen((event) => scope.$apply(() {
+			stream.listen((event) => scope.apply(() {
 				if (predicate == null || predicate(event)) {
 					event.preventDefault();
 					value({r'$event': event});
@@ -36,7 +36,7 @@ class TodoDOMEventDirective {
 	}
 
 	set todoFocus(watchExpr) {
-		scope.$watch(watchExpr, (value) {
+		scope.watch(watchExpr, (value, previousValue) {
 			if (value) {
 				element.focus();
 			}
